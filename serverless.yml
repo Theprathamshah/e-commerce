@@ -1,0 +1,30 @@
+service: ecommerce-app
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+
+  environment:
+    DB_USERNAME: admin
+    DB_PASSWORD: mypassword
+    DB_HOST: !GetAtt EcommerceDBInstance.Endpoint.Address
+    DB_NAME: ecommerce
+
+resources:
+  Resources:
+    EcommerceDBInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        DBInstanceIdentifier: ecommerce-db
+        AllocatedStorage: 20
+        DBInstanceClass: db.t3.micro
+        Engine: postgres
+        EngineVersion: "13.3"
+        MasterUsername: admin
+        MasterUserPassword: password
+        DBName: ecommerce
+        PubliclyAccessible: true
+        VPCSecurityGroups:
+          - sg-0e1dc2e55e3111f86  # Replace with the security group ID
+        BackupRetentionPeriod: 7
