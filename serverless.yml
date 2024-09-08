@@ -2,9 +2,10 @@ service: ecommerce-app
 
 provider:
   name: aws
-  runtime: nodejs14.x
-  region: us-east-1
-
+  runtime: nodejs20.x
+  region: ap-south-1
+  deploymentBucket: 
+    name: serverless-deployment-bucket-backend
   environment:
     DB_USERNAME: admin
     DB_PASSWORD: mypassword
@@ -20,11 +21,11 @@ resources:
         AllocatedStorage: 20
         DBInstanceClass: db.t3.micro
         Engine: postgres
-        EngineVersion: "13.3"
-        MasterUsername: admin
+        EngineVersion: "15.4"
+        MasterUsername: ecommerce_admin # Corrected username
         MasterUserPassword: password
         DBName: ecommerce
         PubliclyAccessible: true
         VPCSecurityGroups:
-          - sg-0e1dc2e55e3111f86  # Replace with the security group ID
+          - sg-0e1dc2e55e3111f86 # Replace with the security group ID
         BackupRetentionPeriod: 7
