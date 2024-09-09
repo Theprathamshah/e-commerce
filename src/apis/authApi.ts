@@ -34,7 +34,7 @@ router.post('/signup', async (req: Request, res: Response) => {
 });
 
 
-const JWT_SECRET = 'your_jwt_secret_key';
+const JWT_SECRET = 'thequickbrownfoxjumpsrightoverthelzaydog';
 
 // Login route
 router.post('/login', async (req: Request, res: Response) => {
