@@ -6,6 +6,6 @@ export const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (user && user.role === 'Admin') {
     next();
   } else {
-    res.status(403).json({ message: 'Access forbidden' });
+    res.status(401).json({ message: 'Access forbidden' });
   }
 };

@@ -8,6 +8,8 @@ interface OrderAttributes {
   status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
 }
 
+// TODO : Status should not be reverted or changed
+
 class Order extends Model<OrderAttributes> implements OrderAttributes {
   public id!: number;
   public buyerId!: number;

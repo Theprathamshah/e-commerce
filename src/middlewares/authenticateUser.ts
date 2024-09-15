@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]; // Assumes Bearer token
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
@@ -15,7 +15,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    req.user = user; // Attach the user to the request object
+    req.user = user;
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Authentication failed' });
