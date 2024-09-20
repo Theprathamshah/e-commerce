@@ -1,14 +1,15 @@
 import express, { Request, Response } from 'express';
 import Product from '../models/product.js';
 import { deleteImageFromS3, uploadToS3 } from '../utils/s3Utils.js';
-import fs from 'fs/promises';
-import path from 'path';
 import multer from 'multer';
 import { authenticateUser } from '../middlewares/authenticateUser.js';
 import authorizeSeller from '../middlewares/authorizeSeller.js';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import sequelize from 'sequelize';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const router = express.Router();
 const upload = multer();
 

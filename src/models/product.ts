@@ -14,7 +14,7 @@ interface ProductAttributes {
     updatedAt?: Date;
 }
 
-interface ProductCreationAttributes extends Optional<ProductAttributes, 'id'> {}
+type ProductCreationAttributes = Optional<ProductAttributes, 'id'>
 
 class Product extends Model {
     public id!: number;

@@ -2,7 +2,9 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/user.js';
 import jwt from 'jsonwebtoken'
-import { json } from 'sequelize';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -30,7 +32,7 @@ router.post('/signup', async (req: Request, res: Response) => {
 });
 
 
-const JWT_SECRET = 'thequickbrownfoxjumpsrightoverthelzaydog';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post('/login', async (req: Request, res: Response) => {
     console.log(`Request is ${req}`);
@@ -50,7 +52,7 @@ router.post('/login', async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '5h' });
+        const token = jwt.sign({ id: user.id, role: user.role }, `${process.env.JWT_SECRET}`, { expiresIn: '5h' });
 
         return res.status(200).json({ message: 'Login successful', token });
     } catch (error) {

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import Order from '../models/order.js';
 import OrderItem from '../models/orderItem.js';
 import Product from '../models/product.js';
-import sequelize,{ Op } from 'sequelize';
+import sequelize from 'sequelize';
 
 const router = express.Router();
 

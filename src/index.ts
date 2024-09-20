@@ -7,7 +7,7 @@ import cors from 'cors';
 import { authenticateUser } from './middlewares/authenticateUser.js';
 
 const app: Application = express();
-const port: number = 3000;
+const port = 3000;
 
 app.use(cors());
 app.use(express.json());
