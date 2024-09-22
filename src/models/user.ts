@@ -65,13 +65,15 @@ User.init({
     type: DataTypes.ENUM('Buyer', 'Seller', 'Admin'),
     allowNull: false,
   },
-}, {
+},  {
   sequelize,
   tableName: 'Users',
   defaultScope: {
-    attributes: { exclude: ['password'] }, // Exclude the password from all queries
+    attributes: { exclude: ['password'] }, // Exclude password in default queries
   },
-  scopes: {},
+  scopes: {
+    withPassword: {},
+  },
 });
 
 export default User;

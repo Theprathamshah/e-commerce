@@ -19,12 +19,13 @@
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["warn"],
       "indent": ["error",2,{"SwitchCase":1}],
+      "@typescript-eslint/no-explicit-any": "off",
       "space-before-blocks": ["error","always"],
       "object-curly-spacing":["error","always"],
       "no-multiple-empty-lines":["error",{"max":1,"maxEOF":0}],
       "no-trailing-spaces":"error",
-      "space-before-function-paren": ["error","never"]
-
+      "space-before-function-paren": ["error","never"],
+      "@typescript-eslint/no-non-null-assertion": "off"
     }
   }
   

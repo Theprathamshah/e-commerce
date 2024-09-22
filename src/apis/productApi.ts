@@ -17,9 +17,8 @@ async function uploadImages(files: Express.Multer.File[]): Promise<string[]> {
   return await Promise.all(
     files.map(async(file: Express.Multer.File) => {
       const fileBuffer = file.buffer;
-      const fileName = file.originalname; // Original file name from multer
-      const fileType = file.mimetype; // Get the MIME type from multer
-
+      const fileName = file.originalname;
+      const fileType = file.mimetype;
       return uploadToS3(fileBuffer, fileName, fileType);
     })
   );
@@ -28,7 +27,7 @@ async function uploadImages(files: Express.Multer.File[]): Promise<string[]> {
 router.post(
   '/',
   authenticateUser,
-  upload.array('images'), // Handle file upload using multer
+  upload.array('images'),
   [
     body('name').notEmpty().withMessage('Product name is required'),
     body('description').notEmpty().withMessage('Product description is required'),
@@ -39,28 +38,21 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { name, description, price, discount, stock } = req.body;
-    const files = req.files as Express.Multer.File[]; // Cast to proper type
-
+    const files = req.files as Express.Multer.File[];
     try {
       console.log(req.user);
       const sellerId = req.user?.id;
-
-      // Upload images and get the S3 URLs
-      const imageUrls = await uploadImages(files); // Fix: await the uploadImages function
-
-      // Create the new product with the image URLs
+      const imageUrls = await uploadImages(files);
       const newProduct = await Product.create({
         name,
         description,
         price,
         discount,
         stock,
-        images: imageUrls, // Store the image URLs in the database
+        images: imageUrls,
         sellerId,
       });
-
       res.status(201).json(newProduct);
     } catch (error) {
       console.error('Error creating product:', error);
@@ -121,7 +113,18 @@ router.get('/seller-count', async(req: Request, res: Response) => {
 router.get('/', async(req: Request, res: Response) => {
   try {
     const products = await Product.findAll();
-    res.status(200).json(products);
+    const newProducts: any[] = [];
+    products.map((product)=>{
+      const imageUrls = product.images.map((imageKey: string) => {
+        return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`;
+      });
+      const productWithImageUrls = {
+        ...product.toJSON(),
+        images: imageUrls,
+      };
+      newProducts.push(productWithImageUrls);
+    })
+    res.status(200).json(newProducts);
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -138,16 +141,13 @@ router.get('/:id', async(req: Request, res: Response) => {
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-
-    // Convert image keys to S3 URLs
     const imageUrls = product.images.map((imageKey: string) => {
       return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`;
     });
 
-    // Attach the full URLs to the product response
     const productWithImageUrls = {
-      ...product.toJSON(), // Convert the Sequelize object to plain JSON
-      images: imageUrls, // Replace the image keys with full URLs
+      ...product.toJSON(),
+      images: imageUrls,
     };
 
     res.status(200).json(productWithImageUrls);

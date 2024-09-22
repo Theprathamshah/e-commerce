@@ -1,4 +1,4 @@
-// middlewares/errorHandler.ts
+
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../errors/CustomError.js';
 

@@ -16,7 +16,7 @@ interface ProductAttributes {
 
 type ProductCreationAttributes = Optional<ProductAttributes, 'id'>;
 
-class Product extends Model<ProductAttributes, ProductCreationAttributes> {
+export class Product extends Model<ProductAttributes, ProductCreationAttributes> {
   public id!: number;
   public name!: string;
   public description!: string;

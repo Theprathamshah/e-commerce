@@ -1,79 +1,85 @@
-import { authenticateUser } from './../middlewares/authenticateUser.js';
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import User from '../models/user.js';
+import { authenticateUser } from './../middlewares/authenticateUser.js';
 import { checkAdmin } from '../middlewares/isAdmin.js';
-import { UserResponse } from '../types/UserResponse.js';
+import { NotFoundError, ValidationError } from '../errors/CustomError.js';
 
 const router = Router();
 
-router.post('/create', async(req: Request, res: Response) => {
+router.post('/create', async(req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.body.username || !req.body.email) {
+      throw new ValidationError('Username and email are required');
+    }
+
     const user = await User.create(req.body);
     res.status(201).json(user);
-  } catch (error:any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: any) {
+    next(error); // Pass the error to the error handler middleware
   }
 });
 
-router.get('/', authenticateUser, checkAdmin, async(req, res) => {
-  console.log('Called fetch all api')
+router.get('/', authenticateUser, checkAdmin, async(req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.findAll();
-
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve users' });
-  }
-});
-router.get('/:id',authenticateUser, checkAdmin, async(req, res) => {
-  try {
-    const users = await User.findAll();
-    const usersJson = users.map(user => {
-      const userJson = user.toJSON() as any;
-      if (userJson.password) {
-        delete userJson.password;
-      }
-      return userJson;
-    });
-    res.json(usersJson);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve users' });
-  }
-});
-router.put('/:id', async(req: Request, res: Response) => {
-  try {
-    const user = await User.findByPk(req.params.id);
-    if (user) {
-      await user.update(req.body);
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error:any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: any) {
+    next(error);
   }
 });
 
-router.delete('/:id', async(req: Request, res: Response) => {
+router.get('/:id', authenticateUser, checkAdmin, async(req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await User.findByPk(req.params.id);
-    if (user) {
-      await user.destroy();
-      res.status(200).json({ message: 'User deleted successfully' });
-    } else {
-      res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      throw new NotFoundError('User not found');
     }
-  } catch (error:any) {
-    res.status(500).json({ error: error.message });
+
+    const userJson = user.toJSON() as any;
+    if (userJson.password) {
+      delete userJson.password;
+    }
+
+    res.json(userJson);
+  } catch (error: any) {
+    next(error); // Pass the error to the error handler middleware
   }
 });
 
-router.delete('/',authenticateUser,checkAdmin, async(req: Request, res: Response) => {
+router.put('/:id', authenticateUser, checkAdmin, async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    await user.update(req.body);
+    res.status(200).json(user);
+  } catch (error: any) {
+    next(error); // Pass the error to the error handler middleware
+  }
+});
+
+router.delete('/:id', authenticateUser, checkAdmin, async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    await user.destroy();
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error: any) {
+    next(error); // Pass the error to the error handler middleware
+  }
+});
+
+router.delete('/', authenticateUser, checkAdmin, async(req: Request, res: Response, next: NextFunction) => {
   try {
     await User.destroy({ where: {} });
     res.status(200).json({ message: 'All users deleted successfully' });
-  } catch (error:any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: any) {
+    next(error); // Pass the error to the error handler middleware
   }
 });
 
