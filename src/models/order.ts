@@ -41,6 +41,7 @@ Order.init({
   status: {
     type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
     allowNull: false,
+    defaultValue: 'Pending'
   },
 }, {
   sequelize,

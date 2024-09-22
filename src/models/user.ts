@@ -28,7 +28,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
 
 User.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.INTEGER.UNSIGNED,
     autoIncrement: true,
     primaryKey: true,
   },
@@ -67,8 +67,11 @@ User.init({
   },
 }, {
   sequelize,
-  modelName: 'User',
-  tableName: 'Users'
+  tableName: 'Users',
+  defaultScope: {
+    attributes: { exclude: ['password'] }, // Exclude the password from all queries
+  },
+  scopes: {},
 });
 
 export default User;

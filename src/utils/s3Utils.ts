@@ -13,7 +13,7 @@ const s3Client = new S3Client({
   },
 });
 
-export const uploadToS3 = async (fileBuffer: Buffer, fileName: string, fileType: string): Promise<string> => {
+export const uploadToS3 = async(fileBuffer: Buffer, fileName: string, fileType: string): Promise<string> => {
   const key = `images/${uuidv4()}-${fileName}`;
 
   const uploadParams = {
@@ -33,7 +33,7 @@ export const uploadToS3 = async (fileBuffer: Buffer, fileName: string, fileType:
   }
 };
 
-export const getImageUrlFromS3 = async (key: string): Promise<string> => {
+export const getImageUrlFromS3 = async(key: string): Promise<string> => {
   const getParams = {
     Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: key,
@@ -50,18 +50,18 @@ export const getImageUrlFromS3 = async (key: string): Promise<string> => {
   }
 }
 
-  export const deleteImageFromS3 = async (key: string): Promise<void> => {
-    const deleteParams = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      Key: key,
-    };
-  
-    try {
-      const command = new DeleteObjectCommand(deleteParams);
-      await s3Client.send(command);
-      console.log(`Image with key ${key} deleted from S3`);
-    } catch (err) {
-      console.error("Error deleting image from S3", err);
-      throw new Error("Could not delete image from S3");
-    }
+export const deleteImageFromS3 = async(key: string): Promise<void> => {
+  const deleteParams = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+    Key: key,
+  };
+
+  try {
+    const command = new DeleteObjectCommand(deleteParams);
+    await s3Client.send(command);
+    console.log(`Image with key ${key} deleted from S3`);
+  } catch (err) {
+    console.error("Error deleting image from S3", err);
+    throw new Error("Could not delete image from S3");
+  }
 };

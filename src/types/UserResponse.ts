@@ -9,4 +9,3 @@ export interface UserResponse {
     role: string;
     password?: string;
 }
-  

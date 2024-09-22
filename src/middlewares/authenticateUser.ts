@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const JWT_SECRET:string = process.env.JWT_SECRET ?? '';
-export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateUser = async(req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -15,7 +15,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
 
     const decoded = jwt.verify(token,JWT_SECRET) as { id: number };
     const user = await User.findByPk(decoded.id);
-    
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
