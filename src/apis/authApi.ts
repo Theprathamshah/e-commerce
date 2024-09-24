@@ -4,7 +4,7 @@ import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ValidationError, UnauthorizedError } from '../errors/CustomError.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
+import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils.js';
 
 dotenv.config();
 

@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const JWT_SECRET:string = process.env.JWT_SECRET ?? '';
+const JWT_SECRET:string = process.env.JWT_ACCESS_TOKEN_SECRET ?? '';
 export const authenticateUser = async(req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];

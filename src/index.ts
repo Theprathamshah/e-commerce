@@ -15,15 +15,23 @@ app.use('/api/v1/auth',authRouter);
 app.use('/api/v1/users',authenticateUser,userRouter);
 app.use('/api/v1/products',authenticateUser, productRouter);
 app.use(errorHandler);
-models.sequelize.sync({ force:false,alter:true }).then(()=>{
-  console.log('Database and tables created!');
-})
 
-app.get('/',(req:Request, res:Response)=>{
-  console.log('api call was made')
+app.get('/', (req: Request, res: Response) => {
+  console.log('API call was made');
   res.send('<h1>Hey there......</h1>');
-})
+});
 
-app.listen(port,()=>{
-  console.log(`Server is up and running on http://localhost:${port}`);
-})
+const startServer = async() => {
+  try {
+    await models.sequelize.sync({ force: false, alter: true });
+    console.log('Database and tables created!');
+    app.listen(port, () => {
+      console.log(`Server is up and running on http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

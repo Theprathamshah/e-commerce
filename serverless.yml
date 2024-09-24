@@ -12,8 +12,28 @@ provider:
     DB_HOST: !GetAtt EcommerceDBInstance.Endpoint.Address
     DB_NAME: ecommerce
 
+custom:
+  ec2:
+    ami: ami-12345678
+    instanceType: t2.micro
+    sshKeyName: your-key-pair-name
+    securityGroupIds:
+      - sg-0123456789abcdef0
+    subnetIds:
+      - subnet-12345678
 resources:
   Resources:
+    EC2Instance:
+      Type: AWS:EC2::Instance
+      Properties:
+        InstanceType: ${self:custom.ec2.instanceType}
+        ImageId: ${self:custom.ec2.ami}
+        KeyName: ${self:custom.ec2.sshKeyName}
+        SecurityGroupIds: ${self:custom.ec2.securityGroupIds}
+        SubnetId: ${self:custom.ec2.subnetIds[0]}
+        Tags:
+          - Key: Name
+            Value: BackendAppEC2
     EcommerceDBInstance:
       Type: AWS::RDS::DBInstance
       Properties:
@@ -22,10 +42,10 @@ resources:
         DBInstanceClass: db.t3.micro
         Engine: postgres
         EngineVersion: "15.4"
-        MasterUsername: ecommerce_admin # Corrected username
+        MasterUsername: ecommerce_admin
         MasterUserPassword: password
         DBName: ecommerce
         PubliclyAccessible: true
         VPCSecurityGroups:
-          - sg-0e1dc2e55e3111f86 # Replace with the security group ID
+          - sg-0e1dc2e55e3111f86
         BackupRetentionPeriod: 7
