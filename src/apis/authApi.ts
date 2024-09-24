@@ -4,6 +4,7 @@ import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ValidationError, UnauthorizedError } from '../errors/CustomError.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 
 dotenv.config();
 
@@ -58,11 +59,36 @@ router.post('/login', async(req: Request, res: Response, next: NextFunction) => 
       throw new UnauthorizedError('Invalid email or password');
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, `${process.env.JWT_SECRET}`, { expiresIn: '5h' });
+    const accessToken = generateAccessToken(user.id, user.role);
+    const refreshToken = generateRefreshToken(user.id, user.role);
 
-    return res.status(200).json({ message: 'Login successful', token });
+    return res.status(200).json({
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     next(error);
+  }
+});
+
+router.post('/token', async(req: Request, res: Response, next: NextFunction) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ message: 'Refresh token is required' });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SECRET!);
+
+    const newAccessToken = generateAccessToken((decoded as any).id, (decoded as any).role);
+
+    return res.status(200).json({
+      accessToken: newAccessToken,
+    });
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid refresh token' });
   }
 });
 
