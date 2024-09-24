@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { ValidationError, UnauthorizedError } from '../errors/CustomError.js';
+import { ValidationError, UnauthorizedError, ForbiddenError } from '../errors/CustomError.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils.js';
 
 dotenv.config();
@@ -72,11 +72,11 @@ router.post('/login', async(req: Request, res: Response, next: NextFunction) => 
   }
 });
 
-router.post('/token', async(req: Request, res: Response, next: NextFunction) => {
+router.post('/token', async(req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    return res.status(400).json({ message: 'Refresh token is required' });
+    throw new ForbiddenError('Request token is required');
   }
 
   try {

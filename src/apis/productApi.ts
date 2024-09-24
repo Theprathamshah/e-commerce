@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import Product from '../models/product.js';
 import { deleteImageFromS3, uploadToS3 } from '../utils/s3Utils.js';
 import multer from 'multer';
@@ -8,6 +8,7 @@ import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import sequelize from 'sequelize';
 import dotenv from 'dotenv';
+import { NotFoundError, ValidationError } from '../errors/CustomError.js'
 
 dotenv.config();
 const router = express.Router();
@@ -33,17 +34,19 @@ router.post(
     body('description').notEmpty().withMessage('Product description is required'),
     body('price').isFloat({ gt: 0 }).withMessage('Price must be a positive number'),
   ],
-  async(req: Request, res: Response) => {
+  async(req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      throw new ValidationError('Invalid input data');
     }
+
     const { name, description, price, discount, stock } = req.body;
     const files = req.files as Express.Multer.File[];
+
     try {
-      console.log(req.user);
       const sellerId = req.user?.id;
       const imageUrls = await uploadImages(files);
+
       const newProduct = await Product.create({
         name,
         description,
@@ -53,22 +56,20 @@ router.post(
         images: imageUrls,
         sellerId,
       });
+
       res.status(201).json(newProduct);
     } catch (error) {
-      console.error('Error creating product:', error);
-      res.status(500).json({ error: 'Failed to create product' });
+      next(error);
     }
   }
 );
 
-router.get('/search', async(req: Request, res: Response) => {
+router.get('/search', async(req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('Request query:', req.query);
-    console.log('Query parameter "q":', req.query.q);
-    const searchQuery = req.query.q as string
+    const searchQuery = req.query.q as string;
 
     if (!searchQuery) {
-      return res.status(400).json({ message: 'Search query is required' });
+      throw new ValidationError('Search query is required');
     }
 
     const products = await Product.findAll({
@@ -81,18 +82,16 @@ router.get('/search', async(req: Request, res: Response) => {
     });
 
     if (!products.length) {
-      return res.status(404).json({ message: 'No products found' });
+      throw new NotFoundError('No products found');
     }
 
     res.json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products', error });
+    next(error);
   }
-
 });
 
-router.get('/seller-count', async(req: Request, res: Response) => {
+router.get('/seller-count', async(req: Request, res: Response, next: NextFunction) => {
   try {
     const productCounts = await Product.findAll({
       attributes: [
@@ -105,55 +104,46 @@ router.get('/seller-count', async(req: Request, res: Response) => {
 
     res.status(200).json(productCounts);
   } catch (error) {
-    console.error('Error fetching product counts by seller:', error);
-    res.status(500).json({ error: 'Failed to fetch product counts by seller' });
+    next(error);
   }
 });
 
-router.get('/', async(req: Request, res: Response) => {
+router.get('/', async(req: Request, res: Response, next: NextFunction) => {
   try {
     const products = await Product.findAll();
-    const newProducts: any[] = [];
-    products.map((product)=>{
-      const imageUrls = product.images.map((imageKey: string) => {
-        return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`;
-      });
-      const productWithImageUrls = {
-        ...product.toJSON(),
-        images: imageUrls,
-      };
-      newProducts.push(productWithImageUrls);
-    })
+    const newProducts: any[] = products.map((product) => ({
+      ...product.toJSON(),
+      images: product.images.map((imageKey: string) => (
+        `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`
+      )),
+    }));
+
     res.status(200).json(newProducts);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
+    next(error);
   }
 });
 
-router.get('/:id', async(req: Request, res: Response) => {
+router.get('/:id', async(req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  console.log('get product by id called');
 
   try {
     const product = await Product.findByPk(id);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      throw new NotFoundError('Product not found');
     }
-    const imageUrls = product.images.map((imageKey: string) => {
-      return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`;
-    });
 
     const productWithImageUrls = {
       ...product.toJSON(),
-      images: imageUrls,
+      images: product.images.map((imageKey: string) => (
+        `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageKey}`
+      )),
     };
 
     res.status(200).json(productWithImageUrls);
   } catch (error) {
-    console.error('Error fetching product:', error);
-    res.status(500).json({ error: 'Failed to fetch product' });
+    next(error);
   }
 });
 
@@ -161,7 +151,7 @@ router.put(
   '/:id',
   authenticateUser,
   authorizeSeller,
-  async(req: Request, res: Response) => {
+  async(req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { name, description, price, discount, stock, images } = req.body;
 
@@ -169,7 +159,7 @@ router.put(
       const product = await Product.findByPk(id);
 
       if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+        throw new NotFoundError('Product not found');
       }
 
       if (images) {
@@ -186,8 +176,7 @@ router.put(
       await product.save();
       res.status(200).json(product);
     } catch (error) {
-      console.error('Error updating product:', error);
-      res.status(500).json({ error: 'Failed to update product' });
+      next(error);
     }
   }
 );
@@ -196,23 +185,21 @@ router.delete(
   '/:id',
   authenticateUser,
   authorizeSeller,
-  async(req: Request, res: Response) => {
+  async(req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     try {
       const product = await Product.findByPk(id);
 
       if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+        throw new NotFoundError('Product not found');
       }
 
       await Promise.all(product.images.map((image: string) => deleteImageFromS3(image)));
-
       await product.destroy();
       res.status(204).send();
     } catch (error) {
-      console.error('Error deleting product:', error);
-      res.status(500).json({ error: 'Failed to delete product' });
+      next(error);
     }
   }
 );

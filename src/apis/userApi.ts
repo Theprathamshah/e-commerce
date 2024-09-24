@@ -15,7 +15,7 @@ router.post('/create', async(req: Request, res: Response, next: NextFunction) =>
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (error: any) {
-    next(error); // Pass the error to the error handler middleware
+    next(error);
   }
 });
 
@@ -42,7 +42,7 @@ router.get('/:id', authenticateUser, checkAdmin, async(req: Request, res: Respon
 
     res.json(userJson);
   } catch (error: any) {
-    next(error); // Pass the error to the error handler middleware
+    next(error);
   }
 });
 
@@ -56,7 +56,7 @@ router.put('/:id', authenticateUser, checkAdmin, async(req: Request, res: Respon
     await user.update(req.body);
     res.status(200).json(user);
   } catch (error: any) {
-    next(error); // Pass the error to the error handler middleware
+    next(error);
   }
 });
 
@@ -70,7 +70,7 @@ router.delete('/:id', authenticateUser, checkAdmin, async(req: Request, res: Res
     await user.destroy();
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error: any) {
-    next(error); // Pass the error to the error handler middleware
+    next(error);
   }
 });
 
@@ -79,7 +79,7 @@ router.delete('/', authenticateUser, checkAdmin, async(req: Request, res: Respon
     await User.destroy({ where: {} });
     res.status(200).json({ message: 'All users deleted successfully' });
   } catch (error: any) {
-    next(error); // Pass the error to the error handler middleware
+    next(error);
   }
 });
 

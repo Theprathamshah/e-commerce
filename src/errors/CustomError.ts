@@ -38,4 +38,11 @@ class UnauthorizedError extends CustomError {
     super(message,401)
   }
 }
-export { CustomError, NotFoundError, ValidationError, InternalServerError, UserNotFound, UnauthorizedError };
+
+class ForbiddenError extends CustomError {
+  constructor(message = 'Access to requested resource is forbidden') {
+    super(message,403)
+  }
+}
+
+export { CustomError, NotFoundError, ValidationError, InternalServerError, UserNotFound, UnauthorizedError, ForbiddenError };
