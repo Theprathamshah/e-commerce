@@ -1,5 +1,5 @@
 
-import Product from '../models/product.js';
+import Product from '../models/product';
 import { Request,Response, NextFunction } from 'express';
 
 const authorizeSeller = async(req: Request, res: Response, next: NextFunction) => {

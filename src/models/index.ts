@@ -1,8 +1,8 @@
-import User from './user.js';
-import Product from './product.js';
-import Order from './order.js';
-import OrderItem from './orderItem.js';
-import sequelize from '../config/database.js';
+import User from './user';
+import Product from './product';
+import Order from './order';
+import OrderItem from './orderItem';
+import sequelize from '../config/database';
 
 User.hasMany(Product, { foreignKey: 'sellerId',onDelete:'CASCADE' });
 Order.belongsTo(User);

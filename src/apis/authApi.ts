@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/user.js';
+import User from '../models/user';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { ValidationError, UnauthorizedError, ForbiddenError } from '../errors/CustomError.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils.js';
+import { ValidationError, UnauthorizedError, ForbiddenError } from '../errors/CustomError';
+import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 
 dotenv.config();
 

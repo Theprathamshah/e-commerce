@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import User from '../models/user.js';
-import { authenticateUser } from './../middlewares/authenticateUser.js';
-import { checkAdmin } from '../middlewares/isAdmin.js';
-import { NotFoundError, ValidationError } from '../errors/CustomError.js';
+import User from '../models/user';
+import { authenticateUser } from './../middlewares/authenticateUser';
+import { checkAdmin } from '../middlewares/isAdmin';
+import { NotFoundError, ValidationError } from '../errors/CustomError';
 
 const router = Router();
 

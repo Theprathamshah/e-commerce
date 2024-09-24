@@ -1,14 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
-import Product from '../models/product.js';
-import { deleteImageFromS3, uploadToS3 } from '../utils/s3Utils.js';
+import Product from '../models/product';
+import { deleteImageFromS3, uploadToS3 } from '../utils/s3Utils';
 import multer from 'multer';
-import { authenticateUser } from '../middlewares/authenticateUser.js';
-import authorizeSeller from '../middlewares/authorizeSeller.js';
+import { authenticateUser } from '../middlewares/authenticateUser';
+import authorizeSeller from '../middlewares/authorizeSeller';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import sequelize from 'sequelize';
 import dotenv from 'dotenv';
-import { NotFoundError, ValidationError } from '../errors/CustomError.js'
+import { NotFoundError, ValidationError } from '../errors/CustomError'
 
 dotenv.config();
 const router = express.Router();

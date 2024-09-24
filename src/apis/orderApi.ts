@@ -1,12 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
-import Order from '../models/order.js';
-import OrderItem from '../models/orderItem.js';
-import Product from '../models/product.js';
+import Order from '../models/order';
+import OrderItem from '../models/orderItem';
+import Product from '../models/product';
 import sequelize from 'sequelize';
-import { NotFoundError, ValidationError } from '../errors/CustomError.js';
+import { NotFoundError, ValidationError } from '../errors/CustomError';
 
 const router = express.Router();
-
 router.post('/', async(req: Request, res: Response,next: NextFunction) => {
 
   try {

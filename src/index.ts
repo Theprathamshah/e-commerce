@@ -1,11 +1,11 @@
 import express, { Application, Request, Response } from 'express';
-import models from './models/index.js';
-import authRouter from './apis/authApi.js'
-import userRouter from './apis/userApi.js'
-import productRouter from './apis/productApi.js'
+import models from './models/index';
+import authRouter from './apis/authApi'
+import userRouter from './apis/userApi'
+import productRouter from './apis/productApi'
 import cors from 'cors';
-import { authenticateUser } from './middlewares/authenticateUser.js';
-import { errorHandler } from './middlewares/errorHandler.js'
+import { authenticateUser } from './middlewares/authenticateUser';
+import { errorHandler } from './middlewares/errorHandler'
 const app: Application = express();
 const port = 3000;
 
