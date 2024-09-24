@@ -1,11 +1,10 @@
-
-
-import { UserAttributes } from '../models/User'; // Adjust the import path as needed
+import { UserAttributes } from '../models/User';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: UserAttributes; // You can also use a more specific type if needed
+      files?: Express.Multer.File[]; // Fix typing for `files`
+      user?: UserAttributes;         // Assuming `user` is added to the request after authentication
     }
   }
 }

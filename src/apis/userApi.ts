@@ -6,7 +6,6 @@ import { UserResponse } from '../types/UserResponse.js';
 
 const router = Router();
 
-// Create a new user
 router.post('/create', async (req: Request, res: Response) => {
     try {
         const user = await User.create(req.body);
@@ -22,7 +21,7 @@ router.get('/', authenticateUser, checkAdmin, async (req, res) => {
         const users = await User.findAll();
         const usersJson = users.map(user => {
           const userJson = user.toJSON() as UserResponse;
-          if (userJson.password) {  // Check if password exists
+          if (userJson.password) {
             delete userJson.password;
           }
           return userJson;
@@ -32,14 +31,12 @@ router.get('/', authenticateUser, checkAdmin, async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve users' });
       }
   });
-  
-  // Get user by ID (admin only)
   router.get('/:id',authenticateUser, checkAdmin, async (req, res) => {
      try {
     const users = await User.findAll();
     const usersJson = users.map(user => {
       const userJson = user.toJSON() as any;
-      if (userJson.password) {  // Check if password exists
+      if (userJson.password) {
         delete userJson.password;
       }
       return userJson;
@@ -49,7 +46,6 @@ router.get('/', authenticateUser, checkAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve users' });
   }
   });
-// Update user by ID
 router.put('/:id', async (req: Request, res: Response) => {
     try {
         const user = await User.findByPk(req.params.id);
@@ -64,7 +60,6 @@ router.put('/:id', async (req: Request, res: Response) => {
     }
 });
 
-// Delete user by ID
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
         const user = await User.findByPk(req.params.id);
@@ -79,7 +74,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 });
 
-// Delete all users
 router.delete('/',authenticateUser,checkAdmin, async (req: Request, res: Response) => {
     try {
         await User.destroy({ where: {} });
