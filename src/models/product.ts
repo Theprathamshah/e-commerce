@@ -56,7 +56,7 @@ Product.init({
     defaultValue: 0,
   },
   images: {
-    type: DataTypes.ARRAY(DataTypes.STRING),  // Change to JSON for MySQL
+    type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: true,
   },
   sellerId: {

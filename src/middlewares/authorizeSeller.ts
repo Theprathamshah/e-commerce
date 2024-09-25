@@ -14,9 +14,8 @@ const authorizeSeller = async(req: Request, res: Response, next: NextFunction) =
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    // Check if the user is the product's seller or has admin rights
     if (userRole === 'admin' || product.sellerId === userId) {
-      next(); // User is authorized
+      next();
     } else {
       return res.status(403).json({ error: 'You are not authorized to edit or delete this product' });
     }
