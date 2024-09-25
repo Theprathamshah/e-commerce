@@ -24,13 +24,14 @@ custom:
 resources:
   Resources:
     EC2Instance:
-      Type: AWS:EC2::Instance
+      Type: AWS::EC2::Instance
       Properties:
-        InstanceType: ${self:custom.ec2.instanceType}
-        ImageId: ${self:custom.ec2.ami}
-        KeyName: ${self:custom.ec2.sshKeyName}
-        SecurityGroupIds: ${self:custom.ec2.securityGroupIds}
-        SubnetId: ${self:custom.ec2.subnetIds[0]}
+        InstanceType: t2.micro
+        ImageId: ami-00e52cd80f25edd3c
+        KeyName: dummy-ec2
+        SecurityGroupIds:
+          - sg-0278418c7f8c4194b
+        SubnetId: subnet-068a6bb11afdaf1d0
         Tags:
           - Key: Name
             Value: BackendAppEC2

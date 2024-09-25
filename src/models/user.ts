@@ -69,7 +69,7 @@ User.init({
   sequelize,
   tableName: 'Users',
   defaultScope: {
-    attributes: { exclude: ['password'] }, // Exclude password in default queries
+    attributes: { exclude: ['password'] },
   },
   scopes: {
     withPassword: {},
