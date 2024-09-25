@@ -1,15 +1,17 @@
 {
-    "compilerOptions": {
-      "target": "ES2016",
-      "rootDir": "./src",
-      "outDir": "./dist",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "moduleResolution": "node",
-      "module": "ESNext"
-    },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
-  }
-  
+  "compilerOptions": {
+    "target": "ES2016",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "paths": {
+      "*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

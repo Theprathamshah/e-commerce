@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.js';
+import sequelize from '../config/database';
 
 interface OrderAttributes {
   id?: number;
@@ -41,6 +41,7 @@ Order.init({
   status: {
     type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
     allowNull: false,
+    defaultValue: 'Pending'
   },
 }, {
   sequelize,

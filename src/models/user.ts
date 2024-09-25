@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.js';
+import sequelize from '../config/database';
 
 interface UserAttributes {
   id?: number;
@@ -28,7 +28,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
 
 User.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.INTEGER.UNSIGNED,
     autoIncrement: true,
     primaryKey: true,
   },
@@ -65,10 +65,15 @@ User.init({
     type: DataTypes.ENUM('Buyer', 'Seller', 'Admin'),
     allowNull: false,
   },
-}, {
+},  {
   sequelize,
-  modelName: 'User',
-  tableName: 'Users'
+  tableName: 'Users',
+  defaultScope: {
+    attributes: { exclude: ['password'] }, // Exclude password in default queries
+  },
+  scopes: {
+    withPassword: {},
+  },
 });
 
 export default User;
