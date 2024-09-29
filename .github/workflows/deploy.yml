@@ -23,9 +23,7 @@ jobs:
       - name: Install Serverless Framework
         run: npm install -g serverless@3.39.0
 
-      - name: Deploy to AWS
+      - name: Run AWS SSO login and deploy
+        run: ./scripts/aws-sso-deploy.sh
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: serverless deploy --verbose
+          AWS_PROFILE: "102413378525_PowerEngineers"

@@ -8,6 +8,8 @@ import productRouter from './apis/productApi'
 import cors from 'cors';
 import { authenticateUser } from './middlewares/authenticateUser';
 import { errorHandler } from './middlewares/errorHandler'
+import { deleteSoftDelete } from 'utils/removeSoftDelete';
+
 const app: Application = express();
 const port = 3000;
 
@@ -32,6 +34,7 @@ const startServer = async() => {
     app.listen(port, () => {
       console.log(`Server is up and running on http://localhost:${port}`);
     });
+    deleteSoftDelete();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
     process.exit(1);
