@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure the full repository is checked out
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -22,6 +24,9 @@ jobs:
 
       - name: Install Serverless Framework
         run: npm install -g serverless@3.39.0
+
+      - name: Make AWS SSO deploy script executable (if needed)
+        run: chmod +x ./scripts/aws-sso-deploy.sh
 
       - name: Run AWS SSO login and deploy
         run: ./scripts/aws-sso-deploy.sh
