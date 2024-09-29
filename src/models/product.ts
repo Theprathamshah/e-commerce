@@ -12,6 +12,7 @@ interface ProductAttributes {
     sellerId: number;
     createdAt?: Date;
     updatedAt?: Date;
+    deletedAt?: Date;
 }
 
 type ProductCreationAttributes = Optional<ProductAttributes, 'id'>;
@@ -63,6 +64,10 @@ Product.init({
   sellerId: {
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   sequelize,
