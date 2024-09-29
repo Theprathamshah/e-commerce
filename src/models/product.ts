@@ -27,6 +27,7 @@ export class Product extends Model<ProductAttributes, ProductCreationAttributes>
   public sellerId!: number;
   public createdAt!: Date;
   public updatedAt!: Date;
+  public deletedAt? : Date;
 }
 
 Product.init({
@@ -67,6 +68,7 @@ Product.init({
   sequelize,
   tableName: 'Products',
   timestamps: true,
+  paranoid: true,
 });
 
 export default Product;

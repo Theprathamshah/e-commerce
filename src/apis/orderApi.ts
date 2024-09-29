@@ -4,22 +4,36 @@ import OrderItem from '../models/orderItem';
 import Product from '../models/product';
 import sequelize from 'sequelize';
 import { NotFoundError, ValidationError } from '../errors/CustomError';
+import User from '../models/user';
 
 const router = express.Router();
-router.post('/', async(req: Request, res: Response,next: NextFunction) => {
 
+router.post('/', async(req: Request, res: Response, next: NextFunction) => {
   try {
-    const { buyerId, totalAmount, status } = req.body;
-    if(!buyerId || !totalAmount) {
-      throw new ValidationError('Please send all required fields');
+    const { buyerId, totalAmount, status, items } = req.body;
+
+    if (!buyerId || !totalAmount || !items || !items.length) {
+      throw new ValidationError('Please send all required fields, including items');
     }
+
     const newOrder = await Order.create({
       buyerId,
       totalAmount,
       status
     });
 
-    res.status(201).json(newOrder);
+    const orderItems = await Promise.all(
+      items.map((item:any) => {
+        return OrderItem.create({
+          orderId: newOrder.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        });
+      })
+    );
+
+    res.status(201).json({ newOrder, orderItems });
   } catch (error) {
     console.error('Error creating order:', error);
     next(error);
@@ -28,11 +42,23 @@ router.post('/', async(req: Request, res: Response,next: NextFunction) => {
 
 router.get('/', async(req: Request, res: Response) => {
   try {
-    const orders = await Order.findAll();
-    res.status(200).json(orders);
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+        },
+        {
+          model: OrderItem,
+          include: [{ model: Product, attributes: ['id', 'name', 'price'] }],
+        },
+      ],
+    });
+
+    return res.status(200).json(orders);
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
+    console.error(error);
+    return res.status(500).json({ error: 'An error occurred while fetching orders.' });
   }
 });
 
@@ -40,18 +66,24 @@ router.get('/:id', async(req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {
-    const order = await Order.findByPk(id);
+    const order = await Order.findByPk(id, {
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+        },
+        {
+          model: OrderItem,
+          include: [{ model: Product, attributes: ['id', 'name', 'price'] }]
+        }
+      ]
+    });
 
     if (!order) {
       throw new NotFoundError(`Order with id ${id} not found`);
     }
 
-    const orderItems = await OrderItem.findAll({
-      where: { orderId: id },
-      include: [{ model: Product, attributes: ['id', 'name', 'price'] }]
-    });
-
-    res.status(200).json({ order, orderItems });
+    res.status(200).json(order);
   } catch (error) {
     console.error('Error fetching order:', error);
     next(error);
@@ -66,7 +98,7 @@ router.put('/:id', async(req: Request, res: Response, next: NextFunction) => {
     const order = await Order.findByPk(id);
 
     if (!order) {
-      throw new NotFoundError(`Order with id ${id} not found!`)
+      throw new NotFoundError(`Order with id ${id} not found!`);
     }
 
     if (totalAmount !== undefined) {
@@ -103,10 +135,9 @@ router.delete('/:id', async(req: Request, res: Response, next: NextFunction) => 
 });
 
 router.post('/order-items', async(req: Request, res: Response, next: NextFunction) => {
-
   try {
     const { orderId, productId, quantity, price } = req.body;
-    if(!orderId || !productId || !quantity || !price) {
+    if (!orderId || !productId || !quantity || !price) {
       throw new ValidationError('Please enter all required details');
     }
     const newOrderItem = await OrderItem.create({
@@ -124,10 +155,9 @@ router.post('/order-items', async(req: Request, res: Response, next: NextFunctio
 });
 
 router.get('/:id/items', async(req: Request, res: Response, next: NextFunction) => {
-
   try {
     const { id } = req.params;
-    if(!id) {
+    if (!id) {
       throw new ValidationError(`Please enter the id`);
     }
     const orderItems = await OrderItem.findAll({
@@ -154,7 +184,7 @@ router.put('/order-items/:id', async(req: Request, res: Response, next: NextFunc
     const orderItem = await OrderItem.findByPk(id);
 
     if (!orderItem) {
-      throw new NotFoundError('Order item not found')
+      throw new NotFoundError('Order item not found');
     }
 
     if (quantity !== undefined) {
@@ -169,7 +199,7 @@ router.put('/order-items/:id', async(req: Request, res: Response, next: NextFunc
     res.status(200).json(orderItem);
   } catch (error) {
     console.error('Error updating order item:', error);
-    next(error)
+    next(error);
   }
 });
 
