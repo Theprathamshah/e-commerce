@@ -26,9 +26,9 @@ jobs:
         run: npm install -g serverless@3.39.0
 
       - name: Make AWS SSO deploy script executable (if needed)
-        run: chmod +x .github\workflows\scripts\aws-sso-deploy.sh
+        run: chmod +x ./scripts/aws-sso-deploy.sh
 
       - name: Run AWS SSO login and deploy
-        run: .github\workflows\scripts\aws-sso-deploy.sh
+        run: ./scripts/aws-sso-deploy.sh
         env:
           AWS_PROFILE: "102413378525_PowerEngineers"
